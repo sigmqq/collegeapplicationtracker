@@ -1,0 +1,332 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --accent:#4F46E5;--accent2:#818CF8;--danger:#E24B4A;--success:#639922;
+    --warn:#BA7517;--surf:var(--color-background-primary);--surf2:var(--color-background-secondary);
+    --border:var(--color-border-tertiary);--text:var(--color-text-primary);--muted:var(--color-text-secondary);
+  }
+  body{font-family:'DM Sans',sans-serif;color:var(--text);padding:0}
+  h1,h2,h3,.display{font-family:'Syne',sans-serif}
+
+  .app{max-width:700px;margin:0 auto;padding:1.5rem 1rem 3rem}
+  .topbar{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2rem;gap:1rem}
+  .topbar h1{font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1}
+  .topbar h1 span{color:var(--accent)}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
+  .stat{background:var(--surf2);border-radius:var(--border-radius-md);padding:0.75rem 1rem;text-align:center}
+  .stat .num{font-family:'Syne',sans-serif;font-size:22px;font-weight:700}
+  .stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+  .stat.s-total .num{color:var(--accent)}
+  .stat.s-app .num{color:var(--warn)}
+  .stat.s-acc .num{color:var(--success)}
+  .stat.s-rej .num{color:var(--danger)}
+
+  .add-btn{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--border-radius-md);padding:8px 16px;cursor:pointer;white-space:nowrap;letter-spacing:.3px}
+  .add-btn:hover{opacity:.9}
+
+  .form-card{background:var(--surf);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1.5rem;display:none}
+  .form-card.open{display:block}
+  .form-card h3{font-size:14px;font-weight:600;margin-bottom:1rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .form-grid.triple{grid-template-columns:1fr 1fr 1fr}
+  .form-grid input,.form-grid select,.form-full input,.form-full select{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--surf2);border:0.5px solid var(--border);border-radius:var(--border-radius-md);padding:8px 10px;color:var(--text)}
+  .form-full{margin-bottom:10px}
+  label.fl{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+  .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+  .btn-cancel{font-family:'DM Sans',sans-serif;font-size:13px;background:none;border:0.5px solid var(--border);border-radius:var(--border-radius-md);padding:7px 14px;cursor:pointer;color:var(--muted)}
+  .btn-save{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:var(--border-radius-md);padding:7px 16px;cursor:pointer}
+
+  .filters{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+  .pill{font-size:12px;font-family:'Syne',sans-serif;font-weight:600;border:0.5px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer;color:var(--muted);background:none;letter-spacing:.3px}
+  .pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  .school-list{display:flex;flex-direction:column;gap:10px}
+  .school-card{background:var(--surf);border:0.5px solid var(--border);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;transition:border-color .15s}
+  .school-card:hover{border-color:var(--color-border-primary)}
+  .school-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;line-height:1.2}
+  .school-meta{font-size:12px;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+  .school-meta span{display:flex;align-items:center;gap:3px}
+  .deadline-chip{font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;display:inline-block}
+  .dl-ok{background:#EAF3DE;color:#3B6D11}
+  .dl-warn{background:#FAEEDA;color:#854F0B}
+  .dl-over{background:#FCEBEB;color:#A32D2D}
+  .status-badge{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;padding:4px 10px;border-radius:var(--border-radius-md);white-space:nowrap;text-align:center;min-width:80px}
+  .s-planning{background:#EEEDFE;color:#534AB7}
+  .s-inprogress{background:#FAEEDA;color:#854F0B}
+  .s-submitted{background:#E6F1FB;color:#185FA5}
+  .s-accepted{background:#EAF3DE;color:#3B6D11}
+  .s-rejected{background:#FCEBEB;color:#A32D2D}
+  .s-waitlisted{background:#F1EFE8;color:#5F5E5A}
+  .school-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .act-btn{font-size:11px;font-family:'Syne',sans-serif;font-weight:600;border:0.5px solid var(--border);border-radius:var(--border-radius-md);padding:4px 10px;cursor:pointer;background:none;color:var(--muted)}
+  .act-btn:hover{background:var(--surf2)}
+  .act-btn.del:hover{color:var(--danger);border-color:var(--danger)}
+  .right-col{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .notes-text{font-size:12px;color:var(--muted);font-style:italic;margin-top:4px;line-height:1.4}
+  .empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:14px}
+  .empty .big{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .progress-bar{height:3px;background:var(--surf2);border-radius:2px;margin-top:4px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--accent2);border-radius:2px;transition:width .4s}
+  .section-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-family:'Syne',sans-serif}
+  .modal-overlay{display:none;position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center;border-radius:var(--border-radius-lg)}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--surf);border-radius:var(--border-radius-lg);padding:1.5rem;width:90%;max-width:420px;border:0.5px solid var(--color-border-secondary)}
+  .modal h3{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:1rem}
+  .modal .field{margin-bottom:12px}
+  .modal .field label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+  .modal .field input,.modal .field select,.modal .field textarea{width:100%;font-family:'DM Sans',sans-serif;font-size:14px;background:var(--surf2);border:0.5px solid var(--border);border-radius:var(--border-radius-md);padding:8px 10px;color:var(--text);resize:vertical}
+  .modal .field textarea{min-height:70px}
+  .inner-wrap{position:relative;min-height:200px}
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <div>
+      <h1>College <span>Tracker</span></h1>
+      <p style="font-size:13px;color:var(--muted);margin-top:4px">Your applications, all in one place</p>
+    </div>
+    <button class="add-btn" onclick="toggleForm()">+ Add School</button>
+  </div>
+
+  <div class="stats-row" id="stats"></div>
+
+  <div class="form-card" id="addForm">
+    <h3>Add a school</h3>
+    <div class="form-grid">
+      <div><label class="fl">School name *</label><input id="f-name" placeholder="e.g. UC Berkeley" /></div>
+      <div><label class="fl">Type</label>
+        <select id="f-type">
+          <option value="Safety">Safety</option>
+          <option value="Target" selected>Target</option>
+          <option value="Reach">Reach</option>
+          <option value="Dream">Dream</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid triple">
+      <div><label class="fl">Deadline</label><input id="f-deadline" type="date" /></div>
+      <div><label class="fl">Status</label>
+        <select id="f-status">
+          <option value="Planning">Planning</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Submitted">Submitted</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Waitlisted">Waitlisted</option>
+        </select>
+      </div>
+      <div><label class="fl">App Type</label>
+        <select id="f-apptype">
+          <option value="Common App">Common App</option>
+          <option value="Coalition App">Coalition App</option>
+          <option value="UC App">UC App</option>
+          <option value="OUAC">OUAC</option>
+          <option value="BC Education Planner">BC Education Planner</option>
+          <option value="Direct">Direct</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-full"><label class="fl">Notes</label><input id="f-notes" placeholder="Scholarship info, requirements, etc." /></div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="toggleForm()">Cancel</button>
+      <button class="btn-save" onclick="addSchool()">Add School</button>
+    </div>
+  </div>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="section-label">Schools <span id="count-label"></span></div>
+  <div class="inner-wrap">
+    <div class="school-list" id="schoolList"></div>
+    <div class="modal-overlay" id="editModal">
+      <div class="modal">
+        <h3 id="modal-title">Edit School</h3>
+        <div class="field"><label>School name</label><input id="e-name" /></div>
+        <div class="field"><label>Type</label>
+          <select id="e-type">
+            <option>Safety</option><option>Target</option><option>Reach</option><option>Dream</option>
+          </select>
+        </div>
+        <div class="field"><label>Deadline</label><input id="e-deadline" type="date" /></div>
+        <div class="field"><label>Status</label>
+          <select id="e-status">
+            <option>Planning</option><option>In Progress</option><option>Submitted</option>
+            <option>Accepted</option><option>Rejected</option><option>Waitlisted</option>
+          </select>
+        </div>
+        <div class="field"><label>App Type</label>
+          <select id="e-apptype">
+            <option>Common App</option><option>Coalition App</option><option>UC App</option><option>OUAC</option><option>BC Education Planner</option><option>Direct</option>
+          </select>
+        </div>
+        <div class="field"><label>Notes</label><textarea id="e-notes"></textarea></div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn-save" onclick="saveEdit()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SCHOOLS_KEY = 'college_tracker_schools_v2';
+let schools = [];
+let filter = 'All';
+let editId = null;
+
+function load(){
+  try{schools=JSON.parse(localStorage.getItem(SCHOOLS_KEY)||'[]')}catch(e){schools=[]}
+}
+function save(){localStorage.setItem(SCHOOLS_KEY,JSON.stringify(schools))}
+
+function statusClass(s){
+  return ({
+    'Planning':'s-planning','In Progress':'s-inprogress','Submitted':'s-submitted',
+    'Accepted':'s-accepted','Rejected':'s-rejected','Waitlisted':'s-waitlisted'
+  })[s]||'s-planning';
+}
+
+function typeColor(t){
+  return({'Safety':'#EAF3DE;color:#3B6D11','Target':'#E6F1FB;color:#185FA5','Reach':'#FAEEDA;color:#854F0B','Dream':'#EEEDFE;color:#534AB7'})[t]||'#F1EFE8;color:#5F5E5A';
+}
+
+function deadlineInfo(dl){
+  if(!dl)return null;
+  const now=new Date(),d=new Date(dl),diff=Math.ceil((d-now)/(1000*60*60*24));
+  if(diff<0)return{cls:'dl-over',text:'Past due'};
+  if(diff<=14)return{cls:'dl-warn',text:`${diff}d left`};
+  return{cls:'dl-ok',text:d.toLocaleDateString('en-US',{month:'short',day:'numeric'})};
+}
+
+function renderStats(){
+  const total=schools.length;
+  const inprog=schools.filter(s=>s.status==='In Progress'||s.status==='Submitted').length;
+  const acc=schools.filter(s=>s.status==='Accepted').length;
+  const rej=schools.filter(s=>s.status==='Rejected').length;
+  document.getElementById('stats').innerHTML=`
+    <div class="stat s-total"><div class="num">${total}</div><div class="lbl">Total</div></div>
+    <div class="stat s-app"><div class="num">${inprog}</div><div class="lbl">Active</div></div>
+    <div class="stat s-acc"><div class="num">${acc}</div><div class="lbl">Accepted</div></div>
+    <div class="stat s-rej"><div class="num">${rej}</div><div class="lbl">Rejected</div></div>
+  `;
+}
+
+function renderFilters(){
+  const statuses=['All','Planning','In Progress','Submitted','Accepted','Rejected','Waitlisted'];
+  const f=document.getElementById('filters');
+  f.innerHTML=statuses.map(s=>`<button class="pill${filter===s?' active':''}" onclick="setFilter('${s}')">${s}</button>`).join('');
+}
+
+function setFilter(s){filter=s;renderFilters();renderList()}
+
+function renderList(){
+  const list=document.getElementById('schoolList');
+  const visible=filter==='All'?schools:schools.filter(s=>s.status===filter);
+  document.getElementById('count-label').textContent=`(${visible.length})`;
+  if(visible.length===0){
+    list.innerHTML=`<div class="empty"><div class="big">${schools.length===0?'No schools yet':'No matches'}</div>${schools.length===0?'Click + Add School to get started':'Try a different filter'}</div>`;
+    return;
+  }
+  const submitted=schools.filter(s=>['Submitted','Accepted','Rejected','Waitlisted'].includes(s.status)).length;
+  const pct=schools.length?Math.round(submitted/schools.length*100):0;
+  list.innerHTML=`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px">
+        <span>Overall progress</span><span>${pct}% submitted or beyond</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+  `+visible.map(s=>{
+    const dl=deadlineInfo(s.deadline);
+    const tc=typeColor(s.type);
+    return`<div class="school-card">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="school-name">${s.name}</span>
+          <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:${tc.split(';')[0]};${tc.split(';')[1]}">${s.type}</span>
+          ${dl?`<span class="deadline-chip ${dl.cls}">${dl.text}</span>`:''}
+        </div>
+        <div class="school-meta">
+          <span>${s.apptype||'Common App'}</span>
+          ${s.deadline?`<span>Due ${new Date(s.deadline).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span>`:''}
+        </div>
+        ${s.notes?`<div class="notes-text">${s.notes}</div>`:''}
+        <div class="school-actions">
+          <button class="act-btn" onclick="openEdit('${s.id}')">Edit</button>
+          <button class="act-btn del" onclick="deleteSchool('${s.id}')">Remove</button>
+        </div>
+      </div>
+      <div class="right-col">
+        <span class="status-badge ${statusClass(s.status)}">${s.status}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleForm(){
+  const f=document.getElementById('addForm');
+  f.classList.toggle('open');
+}
+
+function addSchool(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name)return;
+  schools.push({
+    id:Date.now().toString(),
+    name,
+    type:document.getElementById('f-type').value,
+    deadline:document.getElementById('f-deadline').value,
+    status:document.getElementById('f-status').value,
+    apptype:document.getElementById('f-apptype').value,
+    notes:document.getElementById('f-notes').value.trim(),
+  });
+  save();
+  document.getElementById('f-name').value='';
+  document.getElementById('f-deadline').value='';
+  document.getElementById('f-notes').value='';
+  document.getElementById('addForm').classList.remove('open');
+  render();
+}
+
+function deleteSchool(id){
+  schools=schools.filter(s=>s.id!==id);
+  save();render();
+}
+
+function openEdit(id){
+  const s=schools.find(x=>x.id===id);
+  if(!s)return;
+  editId=id;
+  document.getElementById('e-name').value=s.name;
+  document.getElementById('e-type').value=s.type;
+  document.getElementById('e-deadline').value=s.deadline||'';
+  document.getElementById('e-status').value=s.status;
+  document.getElementById('e-apptype').value=s.apptype||'Common App';
+  document.getElementById('e-notes').value=s.notes||'';
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeModal(){document.getElementById('editModal').classList.remove('open');editId=null}
+
+function saveEdit(){
+  if(!editId)return;
+  const idx=schools.findIndex(s=>s.id===editId);
+  if(idx===-1)return;
+  schools[idx]={
+    ...schools[idx],
+    name:document.getElementById('e-name').value.trim()||schools[idx].name,
+    type:document.getElementById('e-type').value,
+    deadline:document.getElementById('e-deadline').value,
+    status:document.getElementById('e-status').value,
+    apptype:document.getElementById('e-apptype').value,
+    notes:document.getElementById('e-notes').value.trim(),
+  };
+  save();closeModal();render();
+}
+
+function render(){renderStats();renderFilters();renderList()}
+load();render();
+</script>
